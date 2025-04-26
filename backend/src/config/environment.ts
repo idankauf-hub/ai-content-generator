@@ -15,6 +15,7 @@ export const env = {
   openai_api_key: process.env.OPENAI_API_KEY || "",
   huggingface_api_token: process.env.HUGGINGFACE_API_TOKEN || "", // Added Hugging Face token
   cors_origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+  redis_url: process.env.REDIS_URL || "redis://localhost:6379",
 };
 
 // Validate required environment variables

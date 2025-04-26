@@ -10,6 +10,7 @@ import { protect, publicRoute } from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
+// Apply cache middleware to GET routes
 router.get("/user", protect, getUserPosts);
 router.get("/:id", publicRoute, getPost);
 

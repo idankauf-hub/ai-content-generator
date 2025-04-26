@@ -5,6 +5,7 @@ import morgan from "morgan";
 import { rateLimit } from "express-rate-limit";
 import { env, validateEnv } from "./config/environment";
 import { connectDB } from "./config/database";
+import { connectRedis } from "./config/redis";
 import { errorHandler } from "./middlewares/error.middleware";
 
 // Import routes
@@ -18,8 +19,9 @@ validateEnv();
 // Create Express app
 const app: Express = express();
 
-// Connect to MongoDB
+// Connect to MongoDB and Redis
 connectDB();
+connectRedis();
 
 // Middleware
 app.use(express.json());
