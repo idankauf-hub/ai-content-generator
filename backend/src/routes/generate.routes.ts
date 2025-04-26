@@ -6,6 +6,6 @@ import { cacheMiddleware } from "../middlewares/cache.middleware";
 const router = express.Router();
 
 // Protected route - generation requires authentication
-router.post("/", protect, cacheMiddleware(), generateAIContent);
+router.post("/", protect, generateAIContent);
 
 export default router;

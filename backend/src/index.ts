@@ -21,7 +21,7 @@ const app: Express = express();
 
 // Connect to MongoDB and Redis
 connectDB();
-connectRedis();
+// connectRedis();
 
 // Middleware
 app.use(express.json());
