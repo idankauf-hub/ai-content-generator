@@ -9,17 +9,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { usePostsQuery, useDeletePostMutation } from "@/lib/hooks/usePostQueries";
-
-interface MongoDBPost {
-    _id: string;
-    id?: string;
-    title: string;
-    content: string;
-    createdAt?: string;
-    updatedAt?: string;
-    author?: string;
-    published?: boolean;
-}
+import type { Post } from "@/lib/types";
 
 export default function DashboardPage() {
     const { data: session } = useSession();
@@ -63,6 +53,7 @@ export default function DashboardPage() {
         return null;
     }
 
+    console.log(posts);
     return (
         <Layout>
             <div className="container mx-auto py-8">
@@ -86,7 +77,7 @@ export default function DashboardPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {posts.map((post: MongoDBPost) => (
+                        {posts.map((post: Post) => (
                             <Card key={post._id} className="flex flex-col">
                                 <CardHeader>
                                     <CardTitle className="line-clamp-1">{post.title}</CardTitle>

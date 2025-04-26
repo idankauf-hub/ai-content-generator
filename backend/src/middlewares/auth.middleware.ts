@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyToken, TokenPayload } from "../services/auth.service";
+import { verifyToken } from "../services/auth.service";
+import { TokenPayload } from "../types/auth.types";
 
 // Extend Express Request interface to include user
 declare global {
@@ -39,5 +40,30 @@ export const protect = (
     console.error("Authentication error:", error.message);
     res.status(401).json({ message: "Not authorized, invalid token" });
     return;
+  }
+};
+
+export const publicRoute = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (token) {
+      // If token exists, verify it and attach user info (but don't require it)
+      try {
+        const decoded = verifyToken(token);
+        req.user = decoded;
+      } catch (error) {
+        // Token is invalid, but we won't block the request
+        console.log("Invalid token provided for public route");
+      }
+    }
+
+    next();
+  } catch (error) {
+    next();
   }
 };

@@ -134,7 +134,7 @@ export const deletePost = async (id: string) => {
 // AI Generation
 export const generateContent = async (params: GenerationParams) => {
   const response = await api.post("/generate", params);
-  return response.data;
+  return response.data.data;
 };
 
 export default api;

@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "Backend API for AI Content Generator",
   "dependencies": {
+    "@huggingface/inference": "^2.8.1",
     "@langchain/community": "^0.3.41",
     "@langchain/core": "^0.3.49",
     "bcrypt": "^5.1.1",

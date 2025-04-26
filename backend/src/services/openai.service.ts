@@ -1,6 +1,3 @@
-import { OpenAI } from "openai";
-import { env } from "../config/environment";
-
 interface GenerationParams {
   topic: string;
   style: string;
@@ -12,71 +9,55 @@ interface GeneratedContent {
   content: string;
 }
 
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: env.openai_api_key,
-});
+import { OpenAI } from "openai";
+import { AppError } from "../middlewares/error.middleware";
 
-// Generate content with OpenAI
-export const generateContent = async (
-  params: GenerationParams
-): Promise<GeneratedContent> => {
-  const { topic, style, length = "medium" } = params;
-
-  // Define length in words
-  const wordCount = {
-    short: 300,
-    medium: 600,
-    long: 1200,
-  };
-
-  const prompt = `
-    Write a blog post about "${topic}" in a ${style} style.
-    The post should be approximately ${wordCount[length]} words.
-    Structure it with a catchy title, introduction, body with relevant sections, and conclusion.
-    Format the content with paragraphs for easy readability.
-    The response should be formatted as a JSON object with "title" and "content" fields.
-  `;
-
+export async function generateContent({
+  topic,
+  style,
+}: GenerationParams): Promise<GeneratedContent> {
   try {
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY!,
+    });
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4.1-mini",
       messages: [
         {
           role: "system",
-          content:
-            "You are a professional writer creating high-quality blog posts. Your output should be well-structured, engaging, and informative.",
+          content: `You are a blog writer who creates engaging and detailed blog posts in a ${style} style. Format your response as JSON.`,
         },
         {
           role: "user",
-          content: prompt,
+          content: `Write a detailed blog post about "${topic}" and format the response as JSON.
+
+            FORMAT YOUR RESPONSE AS JSON LIKE THIS:
+            {
+            "title": "Your Catchy Title Here",
+            "content": "Paragraph 1...\n\nParagraph 2...\n\nParagraph 3..."
+            }
+
+            IMPORTANT:
+            - The title should be catchy but NOT include the word "Title:" at the beginning
+            - Make it engaging, informative, and well-structured
+            - Include at least 5 paragraphs`,
         },
       ],
-      response_format: { type: "json_object" },
       temperature: 0.7,
+      max_tokens: 600,
+      response_format: { type: "json_object" },
     });
 
-    const responseContent = response.choices[0]?.message?.content;
+    const generatedText = response.choices[0]?.message?.content || "";
+    const parsed = JSON.parse(generatedText);
 
-    if (!responseContent) {
-      throw new Error("Failed to generate content: No response from API");
-    }
+    const cleanTitle = parsed.title.replace(/^Title:\s*["']?|["']$/g, "");
 
-    // Parse the JSON response
-    try {
-      const parsedContent = JSON.parse(responseContent) as GeneratedContent;
-      return parsedContent;
-    } catch (error) {
-      console.error("Failed to parse OpenAI response as JSON", responseContent);
-      // Fallback: If JSON parsing fails, try to extract title and content manually
-      const title = topic; // Use the topic as a fallback title
-      return {
-        title,
-        content: responseContent,
-      };
-    }
-  } catch (error: any) {
-    console.error("Error generating content with OpenAI:", error.message);
-    throw new Error(`Failed to generate content: ${error.message}`);
+    return {
+      title: cleanTitle,
+      content: parsed.content,
+    };
+  } catch (error) {
+    throw new AppError(`Failed to generate content`, 500);
   }
-};
+}

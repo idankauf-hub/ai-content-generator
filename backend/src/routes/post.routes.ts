@@ -1,23 +1,20 @@
 import express from "express";
 import {
   createPost,
-  getUserPosts,
-  getPost,
-  updatePost,
   deletePost,
+  getPost,
+  getUserPosts,
+  updatePost,
 } from "../controllers/post.controller";
-import { protect } from "../middlewares/auth.middleware";
+import { protect, publicRoute } from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
-// Protected routes - all post routes require authentication
-router.use(protect);
+router.get("/user", protect, getUserPosts);
+router.get("/:id", publicRoute, getPost);
 
-// Post routes
-router.post("/save", createPost);
-router.get("/user", getUserPosts);
-router.get("/:id", getPost);
-router.put("/:id", updatePost);
-router.delete("/:id", deletePost);
+router.post("/save", protect, createPost);
+router.put("/:id", protect, updatePost);
+router.delete("/:id", protect, deletePost);
 
 export default router;

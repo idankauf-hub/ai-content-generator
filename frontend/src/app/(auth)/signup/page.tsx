@@ -49,7 +49,7 @@ export default function SignupPage() {
                     <CardTitle className="text-2xl">Create an account</CardTitle>
                     <CardDescription>Sign up to get started with AI content generation</CardDescription>
                 </CardHeader>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
                             <label htmlFor="name" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">

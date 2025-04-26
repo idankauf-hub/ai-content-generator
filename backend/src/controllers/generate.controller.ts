@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { generateContent } from "../services/huggingface.service";
+import { generateContent } from "../services/openai.service";
 import { AppError } from "../middlewares/error.middleware";
 
 export const generateAIContent = async (
@@ -7,14 +7,13 @@ export const generateAIContent = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { topic, style, length } = req.body;
+    const { topic, style } = req.body;
 
     if (!topic || !style) {
       throw new AppError("Please provide topic and style", 400);
     }
 
-    const content = await generateContent({ topic, style, length });
-
+    const content = await generateContent({ topic, style });
     res.status(200).json({
       success: true,
       data: content,

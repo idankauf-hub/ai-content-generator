@@ -1,19 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Layout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { useParams } from "next/navigation";
-import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPost } from "@/lib/api";
 import { Post } from "@/lib/store";
-import Link from "next/link";
-import { formatPostData } from "@/lib/utils";
 import { isAxiosError } from "@/lib/types";
-import { Layout } from "@/components/layout";
+import { formatPostData } from "@/lib/utils";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function PostPage() {
     const params = useParams();
+    const router = useRouter();
     const [post, setPost] = useState<Post | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -67,7 +68,13 @@ export default function PostPage() {
 
     return (
         <Layout>
+
             <div className="container mx-auto py-8 max-w-4xl">
+                <div className="flex justify-end mb-4">
+                    <Button onClick={() => router.push("/dashboard")} variant="outline" className="flex justify-end">
+                        Back to Dashboard
+                    </Button>
+                </div>
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-3xl">{post.title}</CardTitle>
@@ -87,12 +94,6 @@ export default function PostPage() {
                                     {paragraph}
                                 </p>
                             ))}
-                        </div>
-
-                        <div className="mt-12 border-t pt-6">
-                            <p className="text-sm text-gray-500 italic">
-                                This content was generated using AI technology.
-                            </p>
                         </div>
                     </CardContent>
                 </Card>

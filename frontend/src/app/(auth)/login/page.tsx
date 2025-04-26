@@ -55,7 +55,7 @@ export default function LoginPage() {
                     <CardTitle className="text-2xl">Welcome back</CardTitle>
                     <CardDescription>Sign in to your account to continue</CardDescription>
                 </CardHeader>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
                             <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">

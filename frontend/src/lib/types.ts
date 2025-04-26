@@ -36,3 +36,14 @@ export interface GenerationParams {
   style: string;
   length?: "short" | "medium" | "long";
 }
+
+// Interface for MongoDB post structure
+export interface Post {
+  _id: string;
+  title: string;
+  content: string;
+  createdAt?: string;
+  updatedAt?: string;
+  author?: string;
+  published?: boolean;
+}

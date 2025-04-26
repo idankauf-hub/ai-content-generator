@@ -6,10 +6,10 @@ import {
   updatePost,
 } from "@/lib/api";
 import { Post } from "@/lib/store";
+import { Post } from "@/lib/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-// Hook for fetching all posts
 export function usePostsQuery(enabled = true) {
   const {
     data: postsData,
@@ -28,13 +28,12 @@ export function usePostsQuery(enabled = true) {
       }
     },
     enabled,
-    staleTime: 10 * 1000, // Consider data fresh for 10 seconds
-    refetchOnWindowFocus: true, // Refetch when window gains focus
-    refetchOnMount: true, // Refetch when component mounts
+    staleTime: 10 * 1000,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
-  // Extract posts from the data structure
-  const posts = postsData?.data || [];
+  const posts = postsData?.data || ([] as Post[]);
 
   return {
     posts,
@@ -45,7 +44,6 @@ export function usePostsQuery(enabled = true) {
   };
 }
 
-// Hook for fetching a single post
 export function useSinglePostQuery(postId: string | null) {
   return useQuery({
     queryKey: ["post", postId],
@@ -54,11 +52,10 @@ export function useSinglePostQuery(postId: string | null) {
       const response = await getPost(postId);
       return response;
     },
-    enabled: !!postId, // Only run if postId exists
+    enabled: !!postId,
   });
 }
 
-// Hook for creating a post
 export function useCreatePostMutation() {
   const queryClient = useQueryClient();
 
@@ -71,14 +68,12 @@ export function useCreatePostMutation() {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       toast.success("Post created successfully");
     },
-    onError: (error) => {
-      console.error("Error creating post:", error);
+    onError: () => {
       toast.error("Failed to create post");
     },
   });
 }
 
-// Hook for updating a post
 export function useUpdatePostMutation() {
   const queryClient = useQueryClient();
 
@@ -93,8 +88,7 @@ export function useUpdatePostMutation() {
       queryClient.invalidateQueries({ queryKey: ["post", variables._id] });
       toast.success("Post updated successfully");
     },
-    onError: (error) => {
-      console.error("Error updating post:", error);
+    onError: () => {
       toast.error("Failed to update post");
     },
   });
@@ -114,8 +108,7 @@ export function useDeletePostMutation() {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       toast.success("Post deleted successfully");
     },
-    onError: (error) => {
-      console.error("Error deleting post:", error);
+    onError: () => {
       toast.error("Failed to delete post");
     },
   });
