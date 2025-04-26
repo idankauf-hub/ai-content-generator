@@ -11,6 +11,7 @@ export interface ApiResponse {
   success?: boolean;
   data?: {
     _id?: string;
+    id?: string;
     title: string;
     content?: string;
     author?: string;
@@ -19,6 +20,7 @@ export interface ApiResponse {
     updatedAt?: string;
   };
   _id?: string;
+  id?: string;
   title?: string;
   content?: string;
   author?: string;
@@ -36,7 +38,7 @@ export const formatPostData = (data: ApiResponse): Post => {
   if (data && data.success && data.data) {
     const postData = data.data;
     return {
-      _id: postData._id || "",
+      _id: postData._id || (postData.id as string) || "",
       title: postData.title || "",
       content: postData.content || "",
       author: postData.author,
@@ -45,10 +47,10 @@ export const formatPostData = (data: ApiResponse): Post => {
       updatedAt: postData.updatedAt,
     };
   }
-  // If the data is directly the post object with _id
+  // If the data is directly the post object with _id or id
   else if (data && (data._id || data.id)) {
     return {
-      _id: data._id || "",
+      _id: data._id || (data.id as string) || "",
       title: data.title || "",
       content: data.content || "",
       author: data.author,
