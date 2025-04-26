@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Post } from "@/lib/store";
+import { Post } from "@/lib/types";
 import { toast } from "sonner";
 
 interface PostEditProps {

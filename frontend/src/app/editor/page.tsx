@@ -7,13 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { generateContent } from "@/lib/api";
 import { useCreatePostMutation, useSinglePostQuery, useUpdatePostMutation } from "@/lib/hooks/usePostQueries";
-import { usePostStore } from "@/lib/store";
 import { AuthStatus, isAxiosError, Post } from "@/lib/types";
 import { formatPostData } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { usePostStore } from "../../lib/store";
 
 export default function EditorPage() {
     const { status } = useSession();
