@@ -1,5 +1,5 @@
-import cors, { CorsOptions } from "cors";
 import "dotenv/config"; // ↖ loads .env automatically
+import cors, { CorsOptions } from "cors";
 import express, { Express } from "express";
 import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
