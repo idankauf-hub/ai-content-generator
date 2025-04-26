@@ -15,11 +15,9 @@ const api = axios.create({
 // Add a request interceptor to add the auth token
 api.interceptors.request.use(async (config) => {
   const session = await getSession();
-  console.log("Current session:", session);
 
   if (session?.user?.accessToken) {
     config.headers.Authorization = `Bearer ${session.user.accessToken}`;
-    console.log("Setting auth header:", `Bearer ${session.user.accessToken}`);
   } else {
     console.log("No access token found in session");
   }
