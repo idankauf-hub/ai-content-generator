@@ -22,6 +22,7 @@ const app: Express = express();
 // Connect to MongoDB and Redis
 connectDB();
 // connectRedis();
+console.log("Allowed CORS Origin:", env.cors_origin);
 
 // Middleware
 app.use(express.json());
