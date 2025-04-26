@@ -5,10 +5,9 @@ import {
   getPosts,
   updatePost,
 } from "@/lib/api";
-import { Post } from "@/lib/store";
-import { Post } from "@/lib/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Post } from "../types";
 
 export function usePostsQuery(enabled = true) {
   const {
@@ -84,7 +83,6 @@ export function useUpdatePostMutation() {
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.invalidateQueries({ queryKey: ["post", variables.id] });
       queryClient.invalidateQueries({ queryKey: ["post", variables._id] });
       toast.success("Post updated successfully");
     },

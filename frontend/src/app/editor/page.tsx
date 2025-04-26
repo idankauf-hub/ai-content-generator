@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { generateContent } from "@/lib/api";
 import { useCreatePostMutation, useSinglePostQuery, useUpdatePostMutation } from "@/lib/hooks/usePostQueries";
-import { Post, usePostStore } from "@/lib/store";
-import { AuthStatus, isAxiosError } from "@/lib/types";
+import { usePostStore } from "@/lib/store";
+import { AuthStatus, isAxiosError, Post } from "@/lib/types";
 import { formatPostData } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -61,12 +61,13 @@ export default function EditorPage() {
         const postData: Post = {
             title,
             content,
+            _id: postId || ""
         };
 
         try {
             setLoading(true);
             if (isEditing && postId) {
-                await updatePostMutation.mutateAsync({ ...postData, id: postId });
+                await updatePostMutation.mutateAsync({ ...postData });
             } else {
                 await createPostMutation.mutateAsync(postData);
             }
