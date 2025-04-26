@@ -1,7 +1,6 @@
 import axios from "axios";
 import { getSession } from "next-auth/react";
-import { Post } from "./store";
-import { GenerationParams } from "./types";
+import { Post, GenerationParams } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 
@@ -79,7 +78,7 @@ export const getPost = async (id: string) => {
   }
 };
 
-export const createPost = async (post: Omit<Post, "id">) => {
+export const createPost = async (post: Omit<Post, "_id">) => {
   try {
     const response = await api.post("/posts/save", post);
     return response.data;
@@ -91,8 +90,8 @@ export const createPost = async (post: Omit<Post, "id">) => {
 
 export const updatePost = async (post: Post) => {
   try {
-    // Handle either _id from MongoDB or id from frontend
-    const postId = post._id || post.id;
+    // Get the post ID
+    const postId = post._id;
     if (!postId) {
       throw new Error("Post ID is required for updates");
     }
