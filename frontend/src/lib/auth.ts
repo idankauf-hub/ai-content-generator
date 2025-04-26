@@ -2,7 +2,6 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { User as NextAuthUser } from "next-auth";
 
-// Extend the NextAuth User type
 interface UserWithToken extends NextAuthUser {
   token?: string;
 }
@@ -21,7 +20,6 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // Use the custom backend API endpoint
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
             {
@@ -42,9 +40,7 @@ export const authOptions: NextAuthOptions = {
           const data = await response.json();
           console.log("Login response:", data);
 
-          // The backend returns an object with user and token
           if (data && data.token) {
-            // If response is like { user: {...}, token: "..." }
             if (data.user) {
               return {
                 id: data.user.id || data.user._id,
@@ -54,7 +50,6 @@ export const authOptions: NextAuthOptions = {
               };
             }
 
-            // If response is like { id: "...", email: "...", name: "...", token: "..." }
             return {
               id: data.id,
               name: data.name,
@@ -77,7 +72,6 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        // Cast to our extended user type
         const userWithToken = user as UserWithToken;
         token.accessToken = userWithToken.token;
         token.id = user.id;

@@ -13,6 +13,8 @@
   "license": "ISC",
   "description": "Backend API for AI Content Generator",
   "dependencies": {
+    "@langchain/community": "^0.3.41",
+    "@langchain/core": "^0.3.49",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

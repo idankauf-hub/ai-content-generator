@@ -1,19 +1,19 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { Layout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { generateContent } from "@/lib/api";
+import { useCreatePostMutation, useSinglePostQuery, useUpdatePostMutation } from "@/lib/hooks/usePostQueries";
+import { Post, usePostStore } from "@/lib/store";
+import { AuthStatus, isAxiosError } from "@/lib/types";
+import { formatPostData } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { getPost, createPost, updatePost, generateContent } from "@/lib/api";
-import { usePostStore, Post } from "@/lib/store";
-import { GenerationParams, AuthStatus, isAxiosError } from "@/lib/types";
-import { formatPostData } from "@/lib/utils";
-import { Layout } from "@/components/layout";
-import { useQueryClient } from "@tanstack/react-query";
 
 export default function EditorPage() {
     const { status } = useSession();
@@ -21,7 +21,6 @@ export default function EditorPage() {
     const searchParams = useSearchParams();
     const postId = searchParams.get("id");
     const isEditing = !!postId;
-    const queryClient = useQueryClient();
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
@@ -31,40 +30,24 @@ export default function EditorPage() {
     const [generating, setGenerating] = useState(false);
     const { setCurrentPost } = usePostStore();
 
-    // Redirect if not authenticated
+    const { data: postData, isLoading: isLoadingPost } = useSinglePostQuery(postId);
+    const createPostMutation = useCreatePostMutation();
+    const updatePostMutation = useUpdatePostMutation();
+
     useEffect(() => {
         if (status === AuthStatus.Unauthenticated) {
             router.push("/login");
         }
     }, [status, router]);
 
-    // Fetch post if editing
     useEffect(() => {
-        async function fetchPost() {
-            if (postId && status === AuthStatus.Authenticated) {
-                try {
-                    setLoading(true);
-                    const response = await getPost(postId);
-
-                    // Format the post data to ensure it matches our frontend structure
-                    const formattedPost = formatPostData(response);
-                    console.log("Loaded post for editing:", formattedPost);
-
-                    // Set the form fields with the post data
-                    setTitle(formattedPost.title || '');
-                    setContent(formattedPost.content || '');
-                    setCurrentPost(formattedPost);
-                } catch (error) {
-                    console.error("Error fetching post:", error);
-                    toast.error("Failed to load post");
-                } finally {
-                    setLoading(false);
-                }
-            }
+        if (postData && isEditing) {
+            const formattedPost = formatPostData(postData);
+            setTitle(formattedPost.title || '');
+            setContent(formattedPost.content || '');
+            setCurrentPost(formattedPost);
         }
-
-        fetchPost();
-    }, [postId, status, setCurrentPost]);
+    }, [postData, isEditing, setCurrentPost]);
 
     const handleSave = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -74,33 +57,22 @@ export default function EditorPage() {
             return;
         }
 
+        const postData: Post = {
+            title,
+            content,
+        };
+
         try {
             setLoading(true);
-            const postData: Post = {
-                title,
-                content,
-            };
 
-            let result;
             if (isEditing && postId) {
-                result = await updatePost({ ...postData, id: postId });
-                toast.success("Post updated successfully");
+                await updatePostMutation.mutateAsync({ ...postData, id: postId });
             } else {
-                result = await createPost(postData);
-                toast.success("Post created successfully");
+                await createPostMutation.mutateAsync(postData);
             }
 
-            // Format the result to ensure it matches our frontend structure
-            const formattedResult = formatPostData(result);
-            setCurrentPost(formattedResult);
-
-            // Invalidate the posts query to force a refetch when returning to dashboard
-            queryClient.invalidateQueries({ queryKey: ['posts'] });
-
-            // Redirect to dashboard
             router.push("/dashboard");
         } catch (error) {
-            console.error("Error saving post:", error);
             if (isAxiosError(error)) {
                 toast.error(error.response?.data?.message || "Failed to save post");
             } else {
@@ -113,37 +85,21 @@ export default function EditorPage() {
 
     const handleGenerate = async () => {
         if (!topic || !style) {
-            toast.error("Please enter a topic and writing style");
+            toast.error("Topic and style are required");
             return;
         }
 
         try {
             setGenerating(true);
-            const params: GenerationParams = { topic, style };
-            const result = await generateContent(params);
-
-            setTitle(result.title || topic);
-            setContent(result.content);
-            toast.success("Content generated successfully");
+            const response = await generateContent({ topic, style });
         } catch (error) {
             console.error("Error generating content:", error);
-            if (isAxiosError(error)) {
-                toast.error(error.response?.data?.message || "Failed to generate content");
-            } else {
-                toast.error("Failed to generate content");
-            }
+            toast.error("Failed to generate content");
         } finally {
             setGenerating(false);
         }
     };
 
-    if (status === AuthStatus.Loading || (loading && isEditing)) {
-        return (
-            <Layout>
-                <div className="flex min-h-[80vh] items-center justify-center">Loading...</div>
-            </Layout>
-        );
-    }
 
     return (
         <Layout>
