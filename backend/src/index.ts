@@ -28,6 +28,8 @@ const whitelist = (process.env.CORS_ORIGINS ?? "")
   .map((o) => o.trim())
   .filter(Boolean);
 
+console.log("CORS whitelist:", whitelist);
+
 const corsOptions: CorsOptions = {
   credentials: true,
   origin: (origin, cb) => {
