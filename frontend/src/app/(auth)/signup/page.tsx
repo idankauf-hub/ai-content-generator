@@ -15,13 +15,28 @@ export default function SignupPage() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [passwordError, setPasswordError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const validatePassword = (password: string) => {
+        if (password.length < 6) {
+            setPasswordError("Password must be at least 6 characters");
+            return false;
+        }
+        setPasswordError("");
+        return true;
+    };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (!name || !email || !password) {
             toast.error("Please fill out all fields");
+            return;
+        }
+
+        if (!validatePassword(password)) {
+            toast.error("Password must be at least 6 characters");
             return;
         }
 
@@ -84,15 +99,25 @@ export default function SignupPage() {
                             <Input
                                 id="password"
                                 type="password"
-                                placeholder="Create a password"
+                                placeholder="Create a password (min 6 characters)"
                                 value={password}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                    setPassword(e.target.value);
+                                    validatePassword(e.target.value);
+                                }}
                                 required
                             />
+                            {passwordError && (
+                                <p className="text-sm text-red-500">{passwordError}</p>
+                            )}
                         </div>
                     </CardContent>
                     <CardFooter className="flex flex-col">
-                        <Button className="w-full" type="submit" disabled={loading}>
+                        <Button
+                            className="w-full"
+                            type="submit"
+                            disabled={loading || (passwordError !== "" && password !== "")}
+                        >
                             {loading ? "Creating account..." : "Create account"}
                         </Button>
                         <p className="mt-4 text-center text-sm text-gray-500">
